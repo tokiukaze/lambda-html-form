@@ -1,0 +1,12 @@
+# ローカル環境で使用するライブラリを列挙
+
+pytest
+pytest-mock
+boto3
+types-requests
+requests
+black
+flake8
+isort
+mypy
+aws-lambda-powertools

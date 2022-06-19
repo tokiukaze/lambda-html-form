@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sam-app
+
+  Sample SAM Template for sam-app
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    
+    Properties:
+      CodeUri: html_input_form/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      
+      # arm64の方が料金が安い
+      Architectures:
+        - arm64
+      
+      # aws-lambda-powertoolsをレイヤによって追加
+      Layers:
+        - !Sub arn:aws:lambda:${AWS::Region}:017000801446:layer:AWSLambdaPowertoolsPython:20
+
+      # faviconを環境変数といて保存
+      Environment:
+        Variables:
+          FAVICON_URL: https://avatars.githubusercontent.com/u/100059107
+
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+        # /formのgetとpostを設定する。名前を同じにすることでhtmlのformタグに"action"を指定する必要がなくなる
+        GetForm:
+          Type: Api
+          Properties:
+            Path: /form
+            Method: get
+        PostForm:
+          Type: Api
+          Properties:
+            Path: /form
+            Method: post
+        # faviconを設定する
+        Favicon:
+          Type: Api
+          Properties:
+            Path: /favicon.ico
+            Method: get
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
